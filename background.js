@@ -48,7 +48,7 @@ function handleSearch(calendarTabs) {
 function handleClick(tab) {
   //console.log("*********Button clicked*********");
   currentTabId = tab.id;
-  var querying = browser.tabs.query({url: "*://calendar.google.com/*"});
+  var querying = browser.tabs.query({url: "*://calendar.google.com/*", currentWindow: true});
   querying.then(handleSearch, onError);
 };
 
