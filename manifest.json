@@ -7,7 +7,7 @@
 
   "manifest_version": 2,
   "name": "Pinned Google Calendar",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "Go to the pinned Google Calendar tab. If it doesn't exist, it's created.",
 
   "icons": {
