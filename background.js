@@ -2,7 +2,12 @@ let currentTabId;
 let calendarTabId;
 let previousTab;
 
-queryTab => browser.tabs.query({ url: "*://calendar.google.com/*", currentWindow: true });
+// Refresh the icon every minute so when the day changes, the icon changes aswell
+myInterval = setInterval(refreshIconInterval, 1000 * 60)
+
+function queryTab() {
+    return browser.tabs.query({ url: "*://calendar.google.com/*", currentWindow: true });
+}
 
 function onError(e) {
     console.log("***Error: " + e);
@@ -26,8 +31,6 @@ function createPinnedTab() {
     )
 };
 
-let
-
 function handleSearch(calendarTabs) {
     //console.log("currentTabId: " + currentTabId);
     if (calendarTabs.length > 0) {
@@ -49,16 +52,28 @@ function handleSearch(calendarTabs) {
     }
 };
 
+function handleSetIconInterval(calendarTabs) {
+    //console.log('*********handleSetIconInterval*********');
+    setButtonIcon(calendarTabs[0].favIconUrl);
+}
+
+function refreshIconInterval() {
+    //console.log('*********refreshIconInterval*********');
+    let querying = queryTab();
+    querying.then(handleSetIconInterval, onError);
+};
+
 function handleClick(tab) {
     //console.log("*********Button clicked*********");
     currentTabId = tab.id;
-    queryTab.then(handleSearch, onError);
+    let querying = queryTab();
+    querying.then(handleSearch, onError);
 };
 
 function update(details) {
     if (details.reason === "install" || details.reason === "update") {
         var opening = browser.runtime.openOptionsPage();
-        opening.then(onOpened, onError);
+        //opening.then(onOpened, onError);
     }
 };
 
@@ -66,6 +81,4 @@ browser.browserAction.onClicked.addListener(handleClick);
 browser.runtime.onInstalled.addListener(update);
 
 var day = new Date().getDate();
-setButtonIcon("https://calendar.google.com/googlecalendar/images/favicon_v2014_" + day + ".ico");
-
-//setTimeout()
+setButtonIcon("https://calendar.google.com/googlecalendar/images/favicons_2020q4/calendar_" + day + ".ico");
