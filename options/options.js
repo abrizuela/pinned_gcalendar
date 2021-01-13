@@ -52,9 +52,11 @@ document.addEventListener('DOMContentLoaded', updateUI);
 document.querySelector('#shortcut').addEventListener('blur', updateShortcut)
 document.querySelector('#reset').addEventListener('click', resetShortcut)
 
+//No está funcionando bien cuando cambio la pestaña sin que se haya guardado antes
+
 /**
  * Handle the keyboard shortcut capture events
  */
-//document.querySelector('#shortcut').addEventListener('focus', startCapturing);
+document.querySelector('#shortcut').addEventListener('focus', startCapturing);
 document.querySelector('#shortcut').addEventListener('keydown', captureKey);
 document.querySelector('#shortcut').addEventListener('keyup', endCaptureShortcut);
