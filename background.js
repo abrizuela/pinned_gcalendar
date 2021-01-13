@@ -73,7 +73,6 @@ function handleClick(tab) {
 function update(details) {
     if (details.reason === "install" || details.reason === "update") {
         var opening = browser.runtime.openOptionsPage();
-        //opening.then(onOpened, onError);
     }
 };
 
