@@ -1,4 +1,8 @@
 const commandName = '_execute_browser_action';
+const shortcutElem = document.querySelector('#shortcut');
+const resetElem = document.querySelector('#reset')
+const updatedMessage = document.querySelector("#updatedMessage");
+const errorMessage = document.querySelector("#errorMessage");
 
 /**
  * Update the UI: set the value of the shortcut textbox.
@@ -7,30 +11,48 @@ async function updateUI() {
     let commands = await browser.commands.getAll();
     for (command of commands) {
         if (command.name === commandName) {
-            document.querySelector('#shortcut').value = command.shortcut;
+            shortcutElem.value = command.shortcut;
         }
     }
+}
+
+/**
+ * Show (and hide) a message
+ */
+async function showMessage(elem) {
+    elem.classList.replace("hidden", "shown");
+    setTimeout(function () { elem.classList.replace("shown", "hidden"); }, 5000);
 }
 
 /**
  * Show and hide a message when the changes are saved
  */
 async function msgUpdated() {
-    var updatedMessage = document.querySelector("#updatedMessage");
-    updatedMessage.classList.replace("hidden", "shown");
-    setTimeout(function () { updatedMessage.classList.replace("shown", "hidden"); }, 3000);
+    showMessage(updatedMessage);
+}
+
+/**
+ * Show an error message when the shortcut entered is invalid
+ */
+async function msgError() {
+    showMessage(errorMessage);
 }
 
 /**
  * Update the shortcut based on the value in the textbox.
  */
 async function updateShortcut() {
-    await browser.commands.update({
-        name: commandName,
-        shortcut: document.querySelector('#shortcut').value
-    });
+    if (endCaptureShortcut()) {
+        await browser.commands.update({
+            name: commandName,
+            shortcut: shortcutElem.value
+        });
+        msgUpdated();
+    } else {
+        msgError();
+    }
     updateUI();
-    msgUpdated();
+    shortcutElem.blur();
 }
 
 /**
@@ -39,6 +61,7 @@ async function updateShortcut() {
 async function resetShortcut() {
     await browser.commands.reset(commandName);
     updateUI();
+    msgUpdated();
 }
 
 /**
@@ -49,14 +72,7 @@ document.addEventListener('DOMContentLoaded', updateUI);
 /**
  * Handle update and reset button clicks
  */
-document.querySelector('#shortcut').addEventListener('blur', updateShortcut)
-document.querySelector('#reset').addEventListener('click', resetShortcut)
-
-//No está funcionando bien cuando cambio la pestaña sin que se haya guardado antes
-
-/**
- * Handle the keyboard shortcut capture events
- */
-document.querySelector('#shortcut').addEventListener('focus', startCapturing);
-document.querySelector('#shortcut').addEventListener('keydown', captureKey);
-document.querySelector('#shortcut').addEventListener('keyup', endCaptureShortcut);
+shortcutElem.addEventListener('focus', startCapturing);
+shortcutElem.addEventListener('keydown', captureKey);
+shortcutElem.addEventListener('keyup', updateShortcut);
+resetElem.addEventListener('click', resetShortcut)
