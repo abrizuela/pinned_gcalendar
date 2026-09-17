@@ -1,4 +1,4 @@
-const commandName = '_execute_browser_action';
+const commandName = '_execute_action';
 const shortcutElem = document.querySelector('#shortcut');
 const resetElem = document.querySelector('#reset')
 const updatedMessage = document.querySelector("#updatedMessage");
@@ -9,7 +9,7 @@ const errorMessage = document.querySelector("#errorMessage");
  */
 async function updateUI() {
     let commands = await browser.commands.getAll();
-    for (command of commands) {
+    for (const command of commands) {
         if (command.name === commandName) {
             shortcutElem.value = command.shortcut;
         }
@@ -75,4 +75,4 @@ document.addEventListener('DOMContentLoaded', updateUI);
 shortcutElem.addEventListener('focus', startCapturing);
 shortcutElem.addEventListener('keydown', captureKey);
 shortcutElem.addEventListener('keyup', updateShortcut);
-resetElem.addEventListener('click', resetShortcut)
+resetElem.addEventListener('click', resetShortcut);
