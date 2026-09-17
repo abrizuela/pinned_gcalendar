@@ -6,14 +6,14 @@ let shortcutKeys;
 function startCapturing() {
     shortcutKeys = [];
     shortcut.value = '';
-    isValidShortcut = true
+    isValidShortcut = true;
 }
 
 function captureKey(event) {
     event.stopPropagation();
     event.preventDefault();
 
-    keyStr = event.key == 'Control' ? 'Ctrl' : event.key
+    let keyStr = event.key == 'Control' ? 'Ctrl' : event.key;
 
     switch (shortcutKeys.length) {
         case 0:
@@ -21,10 +21,10 @@ function captureKey(event) {
             break;
         case 1:
             (modifiers.includes(keyStr) && keyStr != shortcutKeys[0]) || (event.keyCode >= 48 && event.keyCode <= 123) ? shortcutKeys.push(keyStr) : isValidShortcut = false;
-            break
+            break;
         case 2:
             modifiers.includes(shortcutKeys[1]) && event.keyCode >= 48 && event.keyCode <= 123 ? shortcutKeys.push(keyStr) : isValidShortcut = false;
-            break
+            break;
         default:
             console.log(`****Invalid shortcut****`);
             isValidShortcut = false;

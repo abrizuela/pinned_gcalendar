@@ -1,6 +1,7 @@
 let currentTabId;
 let calendarTabId;
 let previousTab;
+let myInterval;
 
 // Refresh the icon every minute so when the day changes, the icon changes aswell
 myInterval = setInterval(refreshIconInterval, 1000 * 60)
@@ -10,12 +11,12 @@ function queryTab() {
 }
 
 function onError(e) {
-    console.log("***Error: " + e);
+    console.log(`***Error: ${e}`);
 };
 
 function setButtonIcon(imageURL) {
     try {
-        browser.browserAction.setIcon({ path: imageURL });
+        browser.action.setIcon({ path: imageURL });
     } catch (e) {
         onError(e);
     }
@@ -32,42 +33,45 @@ function createPinnedTab() {
 };
 
 function handleSearch(calendarTabs) {
-    //console.log("currentTabId: " + currentTabId);
-    if (calendarTabs.length > 0) {
-        //console.log("there is a calendar tab");
-        calendarTabId = calendarTabs[0].id;
-        if (calendarTabId === currentTabId) {
-            //console.log("I'm in the calendar tab");
-            browser.tabs.update(previousTab, { active: true, });
-        } else {
-            //console.log("I'm NOT in the calendar tab");
-            previousTab = currentTabId;
-            browser.tabs.update(calendarTabId, { active: true, });
-        }
-        setButtonIcon(calendarTabs[0].favIconUrl);
-    } else {
+    //console.log(`currentTabId: ${currentTabId}`);
+    if (!Array.isArray(calendarTabs) || calendarTabs.length === 0) {
         //console.log("there is NO calendar tab");
         previousTab = currentTabId;
         createPinnedTab();
+        return;
     }
+
+    //console.log("there is a calendar tab");
+    calendarTabId = calendarTabs[0].id;
+    if (calendarTabId === currentTabId) {
+        //console.log("I'm in the calendar tab");
+        browser.tabs.update(previousTab, { active: true });
+    } else {
+        //console.log("I'm NOT in the calendar tab");
+        previousTab = currentTabId;
+        browser.tabs.update(calendarTabId, { active: true });
+    }
+    setButtonIcon(calendarTabs[0].favIconUrl);
 };
 
 function handleSetIconInterval(calendarTabs) {
     //console.log('*********handleSetIconInterval*********');
-    setButtonIcon(calendarTabs[0].favIconUrl);
+    if (Array.isArray(calendarTabs) && calendarTabs.length > 0) {
+        setButtonIcon(calendarTabs[0].favIconUrl);
+    }
 }
 
 function refreshIconInterval() {
     //console.log('*********refreshIconInterval*********');
-    let querying = queryTab();
-    querying.then(handleSetIconInterval, onError);
+    let tabQuery = queryTab();
+    tabQuery.then(handleSetIconInterval).catch(onError);
 };
 
 function handleClick(tab) {
     //console.log("*********Button clicked*********");
     currentTabId = tab.id;
-    let querying = queryTab();
-    querying.then(handleSearch, onError);
+    let tabQuery = queryTab();
+    tabQuery.then(handleSearch).catch(onError);
 };
 
 function update(details) {
@@ -76,8 +80,8 @@ function update(details) {
     }
 };
 
-browser.browserAction.onClicked.addListener(handleClick);
+browser.action.onClicked.addListener(handleClick);
 browser.runtime.onInstalled.addListener(update);
 
 var day = new Date().getDate();
-setButtonIcon("https://calendar.google.com/googlecalendar/images/favicons_2020q4/calendar_" + day + ".ico");
+setButtonIcon(`https://calendar.google.com/googlecalendar/images/favicons_2026/calendar_${day}_32.ico`);
